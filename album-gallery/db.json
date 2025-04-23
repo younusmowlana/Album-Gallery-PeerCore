@@ -1,0 +1,61 @@
+{
+  "albums": [
+    {
+      "id": "1",
+      "title": "Vacation",
+      "description": "Summer vacation photos",
+      "createdAt": "2023-06-15T00:00:00Z",
+      "coverPhotoUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+    },
+    {
+      "id": "2",
+      "title": "Family",
+      "description": "Family gatherings",
+      "createdAt": "2023-05-20T00:00:00Z",
+      "coverPhotoUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+    },
+    {
+      "id": "3",
+      "title": "Nature",
+      "description": "Beautiful nature scenes",
+      "createdAt": "2023-07-10T00:00:00Z",
+      "coverPhotoUrl": "https://images.unsplash.com/photo-1454496522488-7a8e488e8606"
+    },
+    {
+      "id": "f7fa",
+      "title": "Trip album",
+      "description": "TRIPING MODE",
+      "createdAt": "2025-04-23T13:06:26.714Z"
+    }
+  ],
+  "photos": [
+    {
+      "id": "1",
+      "albumId": 1,
+      "title": "Beach sunset",
+      "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+      "createdAt": "2023-06-16T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "albumId": 1,
+      "title": "Mountain view",
+      "url": "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
+      "createdAt": "2023-06-17T00:00:00Z"
+    },
+    {
+      "id": "3",
+      "albumId": 2,
+      "title": "Family dinner",
+      "url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+      "createdAt": "2023-05-21T00:00:00Z"
+    },
+    {
+      "id": "4",
+      "albumId": 3,
+      "title": "Forest path",
+      "url": "https://images.unsplash.com/photo-1448375240586-882707db888b",
+      "createdAt": "2023-07-11T00:00:00Z"
+    }
+  ]
+}
