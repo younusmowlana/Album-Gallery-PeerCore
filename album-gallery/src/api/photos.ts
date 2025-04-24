@@ -9,11 +9,36 @@ export interface Photo {
   title: string;
   url: string;
   createdAt: string;
+  albumTitle?: string;
+}
+
+export interface Album {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  coverPhotoUrl: string;
 }
 
 export const fetchPhotosByAlbumId = async (albumId: number): Promise<Photo[]> => {
-  const response = await axios.get(`${API_URL}/photos?albumId=${albumId}`);
-  return response.data;
+  try {
+    // Fetch photos and album data in parallel
+    const [photosResponse, albumResponse] = await Promise.all([
+      axios.get(`${API_URL}/photos?albumId=${albumId}`),
+      axios.get(`${API_URL}/albums/${albumId}`)
+    ]);
+
+    // Add album title to each photo
+    const photosWithAlbumTitle = photosResponse.data.map((photo: Photo) => ({
+      ...photo,
+      albumTitle: albumResponse.data.title
+    }));
+
+    return photosWithAlbumTitle;
+  } catch (error) {
+    console.error('Error fetching photos or album:', error);
+    throw error;
+  }
 };
 
 const fileToBase64 = (file: File): Promise<string> => {

@@ -39,6 +39,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Masonry from "@mui/lab/Masonry";
 
 export default function PhotoGrid({ albumId }: { albumId: number }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -80,7 +81,7 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
 
   useEffect(() => {
     queryClient.invalidateQueries(["photos", albumId]);
-  }, [albumId, queryClient]);
+  }, [albumId]);
 
   const handleNextSlide = () => {
     setCurrentSlideIndex((prevIndex) =>
@@ -137,25 +138,84 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
     if (slideshowActive) {
       const timer = setTimeout(() => {
         setControlsVisible(false);
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [slideshowActive, currentSlideIndex]);
 
   if (isLoading)
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Grid container spacing={3}>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "1920px",
+          mx: "auto",
+          px: { xs: 2, sm: 3, md: 4 },
+          mt: 4,
+        }}
+      >
+        <Masonry
+          columns={{ xs: 2, sm: 3, md: 4, lg: 5 }}
+          spacing={2}
+          sx={{ width: "auto" }}
+        >
           {[...Array(8)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <Skeleton variant="rectangular" width="100%" height={200} />
-              <Box sx={{ pt: 0.5 }}>
-                <Skeleton width="60%" />
-                <Skeleton width="40%" />
+            <Box
+              key={index}
+              sx={{
+                position: "relative",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={0}
+                sx={{
+                  paddingTop: "100%", // Square aspect ratio
+                  borderRadius: 2,
+                  bgcolor: "grey.100",
+                  transform: "none", // Disable default pulse animation
+                  animation: "wave 1.5s ease-in-out infinite",
+                  "@keyframes wave": {
+                    "0%": { opacity: 0.6 },
+                    "50%": { opacity: 0.3 },
+                    "100%": { opacity: 0.6 },
+                  },
+                }}
+              />
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  p: 2,
+                  bgcolor: "rgba(0,0,0,0.02)",
+                }}
+              >
+                <Skeleton
+                  width="60%"
+                  height={20}
+                  sx={{
+                    mb: 1,
+                    bgcolor: "grey.200",
+                    animation: "wave 1.5s ease-in-out 0.2s infinite",
+                  }}
+                />
+                <Skeleton
+                  width="40%"
+                  height={16}
+                  sx={{
+                    bgcolor: "grey.200",
+                    animation: "wave 1.5s ease-in-out 0.4s infinite",
+                  }}
+                />
               </Box>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Masonry>
       </Box>
     );
 
@@ -180,11 +240,18 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
             startIcon={<AddPhotoAlternateIcon />}
             onClick={() => setUploadModalOpen(true)}
             sx={{
-              mt: 2,
-              borderRadius: 2,
-              boxShadow: theme.shadows[2],
+              backgroundColor: "#0d7c73",
+              color: "white",
               "&:hover": {
-                boxShadow: theme.shadows[4],
+                backgroundColor: "#0a635c",
+              },
+              "&:disabled": {
+                backgroundColor: "#b2dfdb",
+                color: "#e0f2f1",
+              },
+              "&:active": {
+                backgroundColor: "#084b45",
+                transform: "scale(0.98)",
               },
             }}
           >
@@ -209,8 +276,8 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
           boxShadow: theme.shadows[1],
         }}
       >
-        <Typography variant="h5" fontWeight="medium">
-          {photos.length} {photos.length === 1 ? "Photo" : "Photos"}
+        <Typography variant="h6" fontWeight="medium">
+          {photos[0]?.albumTitle || "Album"} Photos
         </Typography>
         <Box display="flex" alignItems="center" gap={1}>
           <ToggleButtonGroup
@@ -304,22 +371,34 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
           }),
         }}
       >
-        {!slideshowActive ? (
-          <Grid container spacing={3}>
-            {photos.map((photo, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={photo.id}>
-                <Grow in timeout={index * 100}>
+        {!slideshowActive && photos && photos.length > 0 && (
+          <Box
+            sx={{
+              width: "100%",
+              overflow: "hidden", // Prevent any potential overflow
+            }}
+          >
+            <Masonry
+              columns={{ xs: 2, sm: 3, md: 4, lg: 5 }}
+              spacing={2}
+              sx={{
+                width: "auto",
+                mx: { xs: -1, sm: 0 }, // Adjust negative margin for mobile
+              }}
+            >
+              {photos.map((photo, index) => (
+                <Grow in timeout={(index % 10) * 100} key={photo.id}>
                   <Card
                     sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
+                      position: "relative",
+                      borderRadius: 2,
+                      overflow: "hidden",
                       transition: "transform 0.2s, box-shadow 0.2s",
                       "&:hover": {
                         transform: "translateY(-4px)",
-                        boxShadow: theme.shadows[6],
-                        "& .MuiCardMedia-root": {
-                          opacity: 0.9,
+                        boxShadow: 4,
+                        "& .photo-overlay": {
+                          opacity: 1,
                         },
                       },
                     }}
@@ -328,31 +407,57 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
                       setSlideshowActive(true);
                     }}
                   >
-                    <CardMedia
-                      component="img"
-                      image={photo.url}
-                      alt={photo.title}
+                    <Box
                       sx={{
-                        height: 200,
-                        objectFit: "cover",
-                        cursor: "pointer",
-                        transition: "opacity 0.3s",
+                        position: "relative",
+                        paddingTop: "100%", // Square aspect ratio
+                        backgroundColor: "rgba(0,0,0,0.05)",
                       }}
-                    />
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography gutterBottom variant="subtitle1" noWrap>
-                        {photo.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {format(new Date(photo.createdAt), "MMMM d, yyyy")}
-                      </Typography>
-                    </CardContent>
+                    >
+                      <CardMedia
+                        component="img"
+                        image={photo.url}
+                        alt={photo.title}
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          cursor: "pointer",
+                        }}
+                      />
+                      <Box
+                        className="photo-overlay"
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          p: 2,
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)",
+                          color: "common.white",
+                          opacity: 0.8,
+                          transition: "opacity 0.3s",
+                        }}
+                      >
+                        <Typography noWrap fontWeight={500}>
+                          {photo.title}
+                        </Typography>
+                        <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                          {format(new Date(photo.createdAt), "MMM d, yyyy")}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Card>
                 </Grow>
-              </Grid>
-            ))}
-          </Grid>
-        ) : (
+              ))}
+            </Masonry>
+          </Box>
+        )}
+        {slideshowActive && (
           <Box
             sx={{
               width: "100%",
