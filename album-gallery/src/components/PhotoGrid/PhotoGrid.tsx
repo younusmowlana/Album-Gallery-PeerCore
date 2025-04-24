@@ -1,45 +1,20 @@
 // components/PhotoGrid/PhotoGrid.tsx
-import {
-  Grid,
-  Typography,
-  Card,
-  CardMedia,
-  CardContent,
-  CircularProgress,
-  Alert,
-  IconButton,
-  Tooltip,
-  ToggleButton,
-  ToggleButtonGroup,
-  Box,
-  Button,
-  useTheme,
-  useMediaQuery,
-  Skeleton,
-  Paper,
-  Fade,
-  Grow,
-  Zoom,
-} from "@mui/material";
-// import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { fetchPhotosByAlbumId } from "../../api/photos";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setViewMode } from "../../store/slices/photosSlice";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import PhotoUploadModal from "../PhotoUploadModal/PhotoUploadModal";
-import { useState, useEffect } from "react";
-import { format } from "date-fns";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
-import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import CloseIcon from "@mui/icons-material/Close";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import SlideshowIcon from "@mui/icons-material/Slideshow";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Box, Typography, Button, IconButton, Tooltip, ToggleButton, ToggleButtonGroup,
+  Skeleton, Fade, Grow, Zoom, useTheme, useMediaQuery
+} from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
+import {
+  AddPhotoAlternate, NavigateBefore, NavigateNext, Fullscreen,
+  FullscreenExit, ZoomIn, ZoomOut, Close, ViewModule, Slideshow
+} from "@mui/icons-material";
 
 export default function PhotoGrid({ albumId }: { albumId: number }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -53,675 +28,173 @@ export default function PhotoGrid({ albumId }: { albumId: number }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const {
-    data: photos,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: photos, isLoading, error } = useQuery({
     queryKey: ["photos", albumId],
     queryFn: () => fetchPhotosByAlbumId(albumId),
   });
 
-  const handleViewModeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newViewMode: "grid" | "slideshow"
-  ) => {
-    if (newViewMode !== null) {
+  const handleViewModeChange = (_: React.MouseEvent<HTMLElement>, newViewMode: "grid" | "slideshow") => {
+    if (newViewMode) {
       dispatch(setViewMode(newViewMode));
-      if (newViewMode === "slideshow") {
-        setSlideshowActive(true);
-        setCurrentSlideIndex(0);
-      } else {
-        setSlideshowActive(false);
+      setSlideshowActive(newViewMode === "slideshow");
+      if (newViewMode === "slideshow") setCurrentSlideIndex(0);
+    }
+  };
+
+  const handleSlideNav = (direction: "prev" | "next") => {
+    const newIndex = direction === "next" 
+      ? (currentSlideIndex + 1) % photos!.length
+      : (currentSlideIndex - 1 + photos!.length) % photos!.length;
+    setCurrentSlideIndex(newIndex);
+    setZoomLevel(1);
+    setControlsVisible(true);
+    setTimeout(() => setControlsVisible(false), 3000);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!slideshowActive) return;
+      switch (e.key) {
+        case "ArrowRight": handleSlideNav("next"); break;
+        case "ArrowLeft": handleSlideNav("prev"); break;
+        case "Escape": setSlideshowActive(false); setFullscreen(false); break;
+        case "f": case "F": setFullscreen(!fullscreen); break;
+        case " ": handleSlideNav("next"); break;
       }
-    }
-  };
-
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    queryClient.invalidateQueries(["photos", albumId]);
-  }, [albumId]);
-
-  const handleNextSlide = () => {
-    setCurrentSlideIndex((prevIndex) =>
-      prevIndex === photos!.length - 1 ? 0 : prevIndex + 1
-    );
-    setZoomLevel(1);
-    setControlsVisible(true);
-    setTimeout(() => setControlsVisible(false), 3000);
-  };
-
-  const handlePrevSlide = () => {
-    setCurrentSlideIndex((prevIndex) =>
-      prevIndex === 0 ? photos!.length - 1 : prevIndex - 1
-    );
-    setZoomLevel(1);
-    setControlsVisible(true);
-    setTimeout(() => setControlsVisible(false), 3000);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (!slideshowActive) return;
-
-    switch (e.key) {
-      case "ArrowRight":
-        handleNextSlide();
-        break;
-      case "ArrowLeft":
-        handlePrevSlide();
-        break;
-      case "Escape":
-        setSlideshowActive(false);
-        setFullscreen(false);
-        break;
-      case "f":
-      case "F":
-        setFullscreen(!fullscreen);
-        break;
-      case " ":
-        handleNextSlide();
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [slideshowActive, photos]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [slideshowActive, photos, currentSlideIndex]);
 
-  useEffect(() => {
-    if (slideshowActive) {
-      const timer = setTimeout(() => {
-        setControlsVisible(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [slideshowActive, currentSlideIndex]);
 
-  if (isLoading)
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: "1920px",
-          mx: "auto",
-          px: { xs: 2, sm: 3, md: 4 },
-          mt: 4,
-        }}
-      >
-        <Masonry
-          columns={{ xs: 2, sm: 3, md: 4, lg: 5 }}
-          spacing={2}
-          sx={{ width: "auto" }}
-        >
-          {[...Array(8)].map((_, index) => (
-            <Box
-              key={index}
-              sx={{
-                position: "relative",
-                borderRadius: 2,
-                overflow: "hidden",
-              }}
-            >
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height={0}
-                sx={{
-                  paddingTop: "100%", // Square aspect ratio
-                  borderRadius: 2,
-                  bgcolor: "grey.100",
-                  transform: "none", // Disable default pulse animation
-                  animation: "wave 1.5s ease-in-out infinite",
-                  "@keyframes wave": {
-                    "0%": { opacity: 0.6 },
-                    "50%": { opacity: 0.3 },
-                    "100%": { opacity: 0.6 },
-                  },
-                }}
-              />
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  p: 2,
-                  bgcolor: "rgba(0,0,0,0.02)",
-                }}
-              >
-                <Skeleton
-                  width="60%"
-                  height={20}
-                  sx={{
-                    mb: 1,
-                    bgcolor: "grey.200",
-                    animation: "wave 1.5s ease-in-out 0.2s infinite",
-                  }}
-                />
-                <Skeleton
-                  width="40%"
-                  height={16}
-                  sx={{
-                    bgcolor: "grey.200",
-                    animation: "wave 1.5s ease-in-out 0.4s infinite",
-                  }}
-                />
-              </Box>
-            </Box>
-          ))}
-        </Masonry>
-      </Box>
-    );
-
-  if (error)
-    return (
-      <Zoom in>
-        <Alert severity="error" sx={{ mt: 2, maxWidth: 600, mx: "auto" }}>
-          Error loading photos. Please try again.
-        </Alert>
-      </Zoom>
-    );
-
-  if (!photos || photos.length === 0)
-    return (
-      <Fade in>
-        <Box textAlign="center" mt={4} p={4}>
-          <Typography variant="h6" gutterBottom color="text.secondary">
-            This album is empty
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddPhotoAlternateIcon />}
-            onClick={() => setUploadModalOpen(true)}
-            sx={{
-              backgroundColor: "#0d7c73",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#0a635c",
-              },
-              "&:disabled": {
-                backgroundColor: "#b2dfdb",
-                color: "#e0f2f1",
-              },
-              "&:active": {
-                backgroundColor: "#084b45",
-                transform: "scale(0.98)",
-              },
-            }}
-          >
-            Add First Photo
-          </Button>
+  if (isLoading) return (
+    <Masonry columns={{ xs: 2, sm: 3, md: 4, lg: 5 }} spacing={2}>
+      {[...Array(8)].map((_, i) => (
+        <Box key={i} sx={{ position: "relative", borderRadius: 2, overflow: "hidden" }}>
+          <Skeleton variant="rectangular" width="100%" height={0} sx={{ paddingTop: "100%" }} />
         </Box>
-      </Fade>
-    );
+      ))}
+    </Masonry>
+  );
+
+  if (error) return (
+    <Zoom in><Alert severity="error" sx={{ mt: 2 }}>Error loading photos</Alert></Zoom>
+  );
+
+  if (!photos?.length) return (
+    <Fade in>
+      <Box textAlign="center" p={4}>
+        <Typography variant="h6" gutterBottom color="text.secondary">This album is empty</Typography>
+        <Button variant="contained" sx={{
+                backgroundColor: "#0d7c73",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#0a635c",
+                },
+                "&:disabled": {
+                  backgroundColor: "#b2dfdb",
+                  color: "#e0f2f1",
+                },
+                "&:active": {
+                  backgroundColor: "#084b45",
+                  transform: "scale(0.98)",
+                },
+              }} startIcon={<AddPhotoAlternate />}onClick={(e) => {
+                e.preventDefault();  // Add this
+                e.stopPropagation(); 
+                console.log("Button clicked - setting modal to true");
+                setUploadModalOpen(true);
+              }}>
+          Add First Photo
+        </Button>
+      </Box>
+    </Fade>
+  );
 
   return (
     <Box sx={{ position: "relative", minHeight: "70vh" }}>
-      {/* Header Controls */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-        sx={{
-          backgroundColor: theme.palette.background.paper,
-          p: 2,
-          borderRadius: 2,
-          boxShadow: theme.shadows[1],
-        }}
-      >
-        <Typography variant="h6" fontWeight="medium">
-          {photos[0]?.albumTitle || "Album"} Photos
-        </Typography>
-        <Box display="flex" alignItems="center" gap={1}>
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={handleViewModeChange}
-            aria-label="photo view mode"
-            size="small"
-            sx={{
-              "& .MuiToggleButton-root": {
-                px: 2,
-                border: "none",
-                color: "#0d7c73",
-                "&.Mui-selected": {
-                  backgroundColor: "#0d7c73",
-                  color: "white",
-                },
-                "&:hover": {
-                  backgroundColor: "rgba(13, 124, 115, 0.08)",
-                },
-              },
-            }}
-          >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} p={2}>
+        <Typography variant="h6">{photos[0]?.albumTitle || "Album"} Photos</Typography>
+        <Box display="flex" gap={1}>
+          <ToggleButtonGroup value={viewMode} exclusive onChange={handleViewModeChange} size="small">
             <ToggleButton value="grid">
-              <Tooltip title="Grid view">
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <ViewModuleIcon fontSize="small" />
-                  {!isMobile && "Grid"}
-                </Box>
-              </Tooltip>
+              <Tooltip title="Grid view"><Box display="flex" alignItems="center" gap={0.5}>
+                <ViewModule fontSize="small" />{!isMobile && "Grid"}
+              </Box></Tooltip>
             </ToggleButton>
             <ToggleButton value="slideshow">
-              <Tooltip title="Slideshow view">
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <SlideshowIcon fontSize="small" />
-                  {!isMobile && "Slideshow"}
-                </Box>
-              </Tooltip>
+              <Tooltip title="Slideshow view"><Box display="flex" alignItems="center" gap={0.5}>
+                <Slideshow fontSize="small" />{!isMobile && "Slideshow"}
+              </Box></Tooltip>
             </ToggleButton>
           </ToggleButtonGroup>
-
-          <Tooltip title="Add photos">
-            <Button
-              variant="contained"
-              onClick={() => setUploadModalOpen(true)}
-              sx={{
-                ml: 1,
-                minWidth: 0,
-                px: isMobile ? 1 : 2,
-                borderRadius: 2,
+          <Button variant="contained" onClick={() => setUploadModalOpen(true)} sx={{
                 backgroundColor: "#0d7c73",
+                color: "white",
                 "&:hover": {
                   backgroundColor: "#0a635c",
                 },
-                "& .MuiButton-startIcon": {
-                  mr: isMobile ? 0 : 0.5,
+                "&:disabled": {
+                  backgroundColor: "#b2dfdb",
+                  color: "#e0f2f1",
                 },
-                // Selected state
-                "&.Mui-selected": {
-                  backgroundColor: "#0a635c",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                  "&:hover": {
-                    backgroundColor: "#084b45",
-                  },
+                "&:active": {
+                  backgroundColor: "#084b45",
+                  transform: "scale(0.98)",
                 },
-              }}
-              startIcon={<AddPhotoAlternateIcon />}
-            >
-              {!isMobile && "Add"}
-            </Button>
-          </Tooltip>
+              }} startIcon={<AddPhotoAlternate />}>
+            {!isMobile && "Add"}
+          </Button>
         </Box>
       </Box>
 
-      {/* Main Content Area */}
-      <Box
-        sx={{
-          position: "relative",
-          transition: "all 0.3s ease",
-          ...(fullscreen && {
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: theme.zIndex.modal,
-            backgroundColor: "rgba(0,0,0,0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }),
-        }}
-      >
-        {!slideshowActive && photos && photos.length > 0 && (
-          <Box
-            sx={{
-              width: "100%",
-              overflow: "hidden", // Prevent any potential overflow
-            }}
-          >
-            <Masonry
-              columns={{ xs: 2, sm: 3, md: 4, lg: 5 }}
-              spacing={2}
-              sx={{
-                width: "auto",
-                mx: { xs: -1, sm: 0 }, // Adjust negative margin for mobile
-              }}
-            >
-              {photos.map((photo, index) => (
-                <Grow in timeout={(index % 10) * 100} key={photo.id}>
-                  <Card
-                    sx={{
-                      position: "relative",
-                      borderRadius: 2,
-                      overflow: "hidden",
-                      transition: "transform 0.2s, box-shadow 0.2s",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: 4,
-                        "& .photo-overlay": {
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                    onClick={() => {
-                      setCurrentSlideIndex(index);
-                      setSlideshowActive(true);
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        position: "relative",
-                        paddingTop: "100%", // Square aspect ratio
-                        backgroundColor: "rgba(0,0,0,0.05)",
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        image={photo.url}
-                        alt={photo.title}
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                        }}
-                      />
-                      <Box
-                        className="photo-overlay"
-                        sx={{
-                          position: "absolute",
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          p: 2,
-                          background:
-                            "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)",
-                          color: "common.white",
-                          opacity: 0.8,
-                          transition: "opacity 0.3s",
-                        }}
-                      >
-                        <Typography noWrap fontWeight={500}>
-                          {photo.title}
-                        </Typography>
-                        <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                          {format(new Date(photo.createdAt), "MMM d, yyyy")}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Card>
-                </Grow>
-              ))}
-            </Masonry>
-          </Box>
-        )}
-        {slideshowActive && (
-          <Box
-            sx={{
-              width: "100%",
-              height: fullscreen ? "100vh" : "70vh",
-              position: "relative",
-              overflow: "hidden",
-              backgroundColor: fullscreen ? "rgba(0,0,0,0.9)" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {/* Slideshow Controls */}
-            {controlsVisible && (
-              <Fade in={controlsVisible}>
-                <Box>
-                  {/* Top Controls */}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      left: 16,
-                      right: 16,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      zIndex: 2,
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      borderRadius: 2,
-                      p: 1,
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
-                    <Typography variant="subtitle1" color="common.white">
-                      {currentSlideIndex + 1} / {photos.length}
-                    </Typography>
-
-                    <Box display="flex" gap={1}>
-                      <Tooltip
-                        title={
-                          fullscreen ? "Exit fullscreen (F)" : "Fullscreen (F)"
-                        }
-                      >
-                        <IconButton
-                          onClick={() => setFullscreen(!fullscreen)}
-                          color="inherit"
-                          size="small"
-                          sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            },
-                          }}
-                        >
-                          {fullscreen ? (
-                            <FullscreenExitIcon />
-                          ) : (
-                            <FullscreenIcon />
-                          )}
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Zoom in (+)">
-                        <IconButton
-                          onClick={() =>
-                            setZoomLevel((prev) => Math.min(prev + 0.25, 3))
-                          }
-                          color="inherit"
-                          size="small"
-                          sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            },
-                          }}
-                        >
-                          <ZoomInIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Zoom out (-)">
-                        <IconButton
-                          onClick={() =>
-                            setZoomLevel((prev) => Math.max(prev - 0.25, 0.5))
-                          }
-                          color="inherit"
-                          size="small"
-                          sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            },
-                          }}
-                        >
-                          <ZoomOutIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Close (ESC)">
-                        <IconButton
-                          onClick={() => {
-                            setSlideshowActive(false);
-                            setFullscreen(false);
-                          }}
-                          color="inherit"
-                          size="small"
-                          sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                            },
-                          }}
-                        >
-                          <CloseIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-
-                  {/* Navigation Arrows */}
-                  <IconButton
-                    onClick={handlePrevSlide}
-                    sx={{
-                      position: "absolute",
-                      left: 16,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "white",
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      "&:hover": {
-                        backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      },
-                      zIndex: 2,
-                      backdropFilter: "blur(4px)",
-                    }}
-                    size="large"
-                  >
-                    <NavigateBeforeIcon fontSize="large" />
+      {!slideshowActive ? (
+        <Masonry columns={{ xs: 2, sm: 3, md: 4, lg: 5 }} spacing={2}>
+          {photos.map((photo, i) => (
+            <Grow in timeout={(i % 10) * 100} key={photo.id}>
+              <Box sx={{ position: "relative", borderRadius: 2, overflow: "hidden", cursor: "pointer" }}
+                onClick={() => { setCurrentSlideIndex(i); setSlideshowActive(true); }}>
+                <Box sx={{ paddingTop: "100%", position: "relative" }}>
+                  <Box component="img" src={photo.url} alt={photo.title} sx={{
+                    position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover"
+                  }} />
+                </Box>
+              </Box>
+            </Grow>
+          ))}
+        </Masonry>
+      ) : (
+        <Box sx={{ width: "100%", height: fullscreen ? "100vh" : "70vh", position: "relative" }}>
+          {controlsVisible && (
+            <Box sx={{ position: "absolute", top: 16, left: 16, right: 16, zIndex: 2 }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography color="white">{currentSlideIndex + 1}/{photos.length}</Typography>
+                <Box display="flex" gap={1}>
+                  <IconButton onClick={() => setFullscreen(!fullscreen)} color="inherit" size="small">
+                    {fullscreen ? <FullscreenExit /> : <Fullscreen />}
                   </IconButton>
-
-                  <IconButton
-                    onClick={handleNextSlide}
-                    sx={{
-                      position: "absolute",
-                      right: 16,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "white",
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      "&:hover": {
-                        backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      },
-                      zIndex: 2,
-                      backdropFilter: "blur(4px)",
-                    }}
-                    size="large"
-                  >
-                    <NavigateNextIcon fontSize="large" />
+                  <IconButton onClick={() => setZoomLevel(p => Math.min(p + 0.25, 3))} color="inherit" size="small">
+                    <ZoomIn />
+                  </IconButton>
+                  <IconButton onClick={() => setZoomLevel(p => Math.max(p - 0.25, 0.5))} color="inherit" size="small">
+                    <ZoomOut />
+                  </IconButton>
+                  <IconButton onClick={() => { setSlideshowActive(false); setFullscreen(false); }} color="inherit" size="small">
+                    <Close />
                   </IconButton>
                 </Box>
-              </Fade>
-            )}
-
-            {/* Current Slide */}
-            <Box
-              sx={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                "&:hover": {
-                  "& .slide-info": {
-                    opacity: 1,
-                  },
-                },
-              }}
-              onClick={() => setControlsVisible(!controlsVisible)}
-            >
-              <img
-                src={photos[currentSlideIndex]?.url}
-                alt={photos[currentSlideIndex]?.title}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: fullscreen ? "90vh" : "60vh",
-                  objectFit: "contain",
-                  transform: `scale(${zoomLevel})`,
-                  transition: "transform 0.3s ease",
-                  cursor: zoomLevel > 1 ? "grab" : "pointer",
-                }}
-                onDoubleClick={() =>
-                  setZoomLevel((prev) => (prev === 1 ? 2 : 1))
-                }
-              />
-
-              <Box
-                className="slide-info"
-                sx={{
-                  color: "white",
-                  textAlign: "center",
-                  mt: 2,
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  padding: 2,
-                  borderRadius: 2,
-                  maxWidth: "80%",
-                  transition: "opacity 0.3s",
-                  opacity: controlsVisible ? 1 : 0.7,
-                  backdropFilter: "blur(4px)",
-                }}
-              >
-                <Typography variant="h6" fontWeight="medium">
-                  {photos[currentSlideIndex]?.title}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                  {photos[currentSlideIndex]?.createdAt &&
-                    format(
-                      new Date(photos[currentSlideIndex]?.createdAt),
-                      "MMMM d, yyyy - h:mm a"
-                    )}
-                </Typography>
               </Box>
             </Box>
+          )}
+          <Box sx={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+            onClick={() => setControlsVisible(!controlsVisible)}>
+            <Box component="img" src={photos[currentSlideIndex]?.url} alt={photos[currentSlideIndex]?.title}
+              sx={{ maxWidth: "100%", maxHeight: "90%", transform: `scale(${zoomLevel})`, cursor: zoomLevel > 1 ? "grab" : "pointer" }} />
           </Box>
-        )}
-      </Box>
-
-      {/* Start Slideshow Button (shown when in slideshow mode but not active) */}
-      {viewMode === "slideshow" && !slideshowActive && (
-        <Box sx={{ textAlign: "center", mt: 4 }}>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => {
-              setCurrentSlideIndex(0);
-              setSlideshowActive(true);
-            }}
-            startIcon={<SlideshowIcon />}
-            sx={{
-              ml: 1,
-              minWidth: 0,
-              px: isMobile ? 1 : 2,
-              borderRadius: 2,
-              backgroundColor: "#0d7c73",
-              "&:hover": {
-                backgroundColor: "#0a635c",
-              },
-              "& .MuiButton-startIcon": {
-                mr: isMobile ? 0 : 0.5,
-              },
-              // Selected state
-              "&.Mui-selected": {
-                backgroundColor: "#0a635c",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                "&:hover": {
-                  backgroundColor: "#084b45",
-                },
-              },
-            }}
-          >
-            Start Slideshow
-          </Button>
         </Box>
       )}
 
-      <PhotoUploadModal
-        open={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        albumId={albumId}
-      />
+      <PhotoUploadModal open={uploadModalOpen} onClose={() => setUploadModalOpen(false)} albumId={albumId} />
     </Box>
   );
 }

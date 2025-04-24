@@ -34,6 +34,8 @@ export const fetchPhotosByAlbumId = async (albumId: number): Promise<Photo[]> =>
       albumTitle: albumResponse.data.title
     }));
 
+    console.log("photosWithAlbumTitle :",photosWithAlbumTitle);
+    
     return photosWithAlbumTitle;
   } catch (error) {
     console.error('Error fetching photos or album:', error);
