@@ -2,60 +2,186 @@
   "albums": [
     {
       "id": "1",
-      "title": "Vacation",
-      "description": "Summer vacation photos",
-      "createdAt": "2023-06-15T00:00:00Z",
+      "title": "Summer Vacation 2023",
+      "description": "Our family trip to Hawaii and California",
+      "createdAt": "2023-08-15T00:00:00Z",
       "coverPhotoUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
     },
     {
       "id": "2",
-      "title": "Family",
-      "description": "Family gatherings",
+      "title": "Family Reunions",
+      "description": "Annual family gatherings from 2020-2023",
       "createdAt": "2023-05-20T00:00:00Z",
       "coverPhotoUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
     },
     {
       "id": "3",
-      "title": "Nature",
-      "description": "Beautiful nature scenes",
+      "title": "Nature Explorations",
+      "description": "Hiking and outdoor adventures",
       "createdAt": "2023-07-10T00:00:00Z",
       "coverPhotoUrl": "https://images.unsplash.com/photo-1454496522488-7a8e488e8606"
     },
     {
-      "id": "f7fa",
-      "title": "Trip album",
-      "description": "TRIPING MODE",
-      "createdAt": "2025-04-23T13:06:26.714Z"
+      "id": "4",
+      "title": "Wedding Anniversary",
+      "description": "10th anniversary celebration in Paris",
+      "createdAt": "2023-09-05T00:00:00Z",
+      "coverPhotoUrl": "https://images.unsplash.com/photo-1519225421980-715cb0215aed"
+    },
+    {
+      "id": "6",
+      "title": "Home Renovation",
+      "description": "Before and after our kitchen remodel",
+      "createdAt": "2023-04-18T00:00:00Z",
+      "coverPhotoUrl": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+    },
+    {
+      "id": "e7dc",
+      "title": "testing",
+      "description": "",
+      "createdAt": "2025-04-24T06:37:18.730Z"
     }
   ],
   "photos": [
     {
       "id": "1",
       "albumId": 1,
-      "title": "Beach sunset",
+      "title": "Waikiki Beach Sunset",
       "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-      "createdAt": "2023-06-16T00:00:00Z"
+      "createdAt": "2023-08-16T18:30:00Z"
     },
     {
       "id": "2",
       "albumId": 1,
-      "title": "Mountain view",
+      "title": "Diamond Head Hike",
       "url": "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
-      "createdAt": "2023-06-17T00:00:00Z"
+      "createdAt": "2023-08-17T09:15:00Z"
     },
     {
       "id": "3",
-      "albumId": 2,
-      "title": "Family dinner",
-      "url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-      "createdAt": "2023-05-21T00:00:00Z"
+      "albumId": 1,
+      "title": "San Francisco Golden Gate",
+      "url": "https://images.unsplash.com/photo-1501594907352-04cda38ebc29",
+      "createdAt": "2023-08-20T14:20:00Z"
     },
     {
       "id": "4",
+      "albumId": 2,
+      "title": "Grandma's 80th Birthday",
+      "url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+      "createdAt": "2023-05-21T19:00:00Z"
+    },
+    {
+      "id": "5",
+      "albumId": 2,
+      "title": "Christmas 2022 Family Photo",
+      "url": "https://media.istockphoto.com/id/886814008/photo/one-happy-family.jpg?s=612x612&w=0&k=20&c=rFscsC1THPfqS3i5aztxypT0hTQJZ7B9wXmEF4kCLEk=",
+      "createdAt": "2022-12-25T16:45:00Z"
+    },
+    {
+      "id": "6",
       "albumId": 3,
-      "title": "Forest path",
+      "title": "Yosemite Waterfall",
       "url": "https://images.unsplash.com/photo-1448375240586-882707db888b",
-      "createdAt": "2023-07-11T00:00:00Z"
+      "createdAt": "2023-07-11T11:10:00Z"
+    },
+    {
+      "id": "7",
+      "albumId": 3,
+      "title": "Autumn Forest Trail",
+      "url": "https://images.unsplash.com/photo-1476231682828-37e571bc172f",
+      "createdAt": "2023-10-05T13:25:00Z"
+    },
+    {
+      "id": "8",
+      "albumId": 4,
+      "title": "Eiffel Tower Dinner",
+      "url": "https://images.unsplash.com/photo-1519225421980-715cb0215aed",
+      "createdAt": "2023-09-06T20:30:00Z"
+    },
+    {
+      "id": "9",
+      "albumId": 4,
+      "title": "Seine River Cruise",
+      "url": "https://images.unsplash.com/photo-1431274172761-fca41d930114",
+      "createdAt": "2023-09-07T16:15:00Z"
+    },
+    {
+      "id": "11",
+      "albumId": 5,
+      "title": "First Steps",
+      "url": "https://images.unsplash.com/photo-1530046339911-0d6c8f5c5f50",
+      "createdAt": "2023-11-15T15:30:00Z"
+    },
+    {
+      "id": "12",
+      "albumId": 6,
+      "title": "Old Kitchen Before Demo",
+      "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+      "createdAt": "2023-04-01T08:00:00Z"
+    },
+    {
+      "id": "13",
+      "albumId": 6,
+      "title": "New Quartz Countertops",
+      "url": "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
+      "createdAt": "2023-04-25T17:45:00Z"
+    },
+    {
+      "id": "14",
+      "albumId": 3,
+      "title": "Rocky Mountain Sunrise",
+      "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+      "createdAt": "2023-09-15T06:20:00Z"
+    },
+    {
+      "id": "4a1d",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1518495973542-4542c06a5843?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHwyfHxuYXR1cmV8ZW58MHx8fHwxNzQ1NDY5Mjc4fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "sun light passing through green leafed tree",
+      "createdAt": "2025-04-24T05:20:55.245Z"
+    },
+    {
+      "id": "138e",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHwxfHxuYXR1cmV8ZW58MHx8fHwxNzQ1NDY5Mjc4fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "orange flowers",
+      "createdAt": "2025-04-24T05:21:06.976Z"
+    },
+    {
+      "id": "0130",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHw2fHxsYW5kc2NhcGV8ZW58MHx8fHwxNzQ1NDcyMDg3fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "tree on body of water near mountains",
+      "createdAt": "2025-04-24T05:22:15.678Z"
+    },
+    {
+      "id": "c656",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHwzfHxsYW5kc2NhcGV8ZW58MHx8fHwxNzQ1NDcyMDg3fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "aerial shot of forest",
+      "createdAt": "2025-04-24T05:22:22.261Z"
+    },
+    {
+      "id": "2319",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1529419412599-7bb870e11810?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHwzfHxuYXR1cmV8ZW58MHx8fHwxNzQ1NDY5Mjc4fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "bed of orange flowers",
+      "createdAt": "2025-04-24T05:46:14.904Z"
+    },
+    {
+      "id": "9b94",
+      "albumId": 3,
+      "url": "https://images.unsplash.com/photo-1530908295418-a12e326966ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHw0fHxuYXR1cmV8ZW58MHx8fHwxNzQ1NDY5Mjc4fDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "calm sky during daytime",
+      "createdAt": "2025-04-24T05:46:20.053Z"
+    },
+    {
+      "id": "4e86",
+      "albumId": 1,
+      "url": "https://images.unsplash.com/photo-1613526949297-1aba25022d0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDIyNTl8MHwxfHNlYXJjaHw0fHxzcmklMjBsYW5rYXxlbnwwfHx8fDE3NDU0NzQ5Njl8MA&ixlib=rb-4.0.3&q=80&w=1080",
+      "title": "cooked rice on brown wooden bowl",
+      "createdAt": "2025-04-24T06:09:37.867Z"
     }
   ]
 }

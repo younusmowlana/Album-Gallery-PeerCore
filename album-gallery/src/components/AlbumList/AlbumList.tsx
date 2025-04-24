@@ -24,12 +24,14 @@ export default function AlbumList({
   albums, 
   viewType, 
   onSelect,
-  isLoading 
+  isLoading, 
+  album_id
 }: { 
   albums: Album[]; 
   viewType: 'table' | 'folder'; 
   onSelect: (id: number) => void;
   isLoading?: boolean;
+  album_id?: number;
 }) {
   if (isLoading) {
     return (
