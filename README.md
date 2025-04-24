@@ -2,29 +2,20 @@ React Assignment – Peercore Nexgen
 This repository contains the React assignment completed as part of the selection process for the React Developer position at Peercore Nexgen.
 
 🔧 Project Setup
+
 1. Clone the Repository
-bash
-Copy
-Edit
-git clone https://github.com/yourusername/react-assignment.git
-cd react-assignment
+**git clone https://github.com/yourusername/react-assignment.git**
+
 2. Install Dependencies
-bash
-Copy
-Edit
-npm install
+**npm install**
+
 🚀 Running the Project
-Start the Frontend
-bash
-Copy
-Edit
-npm run dev
+
+1. Start the Frontend
+**npm run dev**
 This will start the React frontend using Vite (or your React dev server) at http://localhost:5173 (default port).
 
-Start the JSON Mock Server
-bash
-Copy
-Edit
-npm run server
+2. Start the JSON Mock Server
+**npm run server**
 This will start the mock API server, typically on http://localhost:3000.
 
